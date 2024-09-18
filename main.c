@@ -1,17 +1,22 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include "lib/errors/debug.h"
 #include "lib/common/common.h"
 #include "lib/gui/interface.h"
 #include "lib/logic/options.h"
+#include "lib/logic/control.h"
 
 static void opt(int argc, char  **argv);
+info_game * currentGame = NULL;
 
 int main (int argc, char **argv)
 {
     TPrintDebug("Start the app in debug");
     opt( argc ,  argv);
+
+    pthread_t pinter_id , plogic_id;
     //startLogs();
 
    
@@ -25,7 +30,12 @@ int main (int argc, char **argv)
         {
             case 1:
 
-                //TODO : Make game ();
+                init_info_game(& currentGame);
+                pthread_cond_init(&cv1,NULL);
+                pthread_cond_init(&cv2,NULL);
+                pthread_mutex_init(& lock , NULL);              
+                pthread_create(&pinter_id , NULL , control_game , (void * ) currentGame);
+                pthread_create(&plogic_id , NULL , interface_game , (void * ) currentGame);
                 flagExec = false;
                 break;
             case 2:
@@ -42,6 +52,11 @@ int main (int argc, char **argv)
         }        
 
     }
+    
+    pthread_join(plogic_id , NULL);
+    pthread_join(pinter_id , NULL);
+    pthread_mutex_destroy(&lock);
+
     
     return SUCCESS;
 }

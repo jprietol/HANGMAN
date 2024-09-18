@@ -7,9 +7,12 @@
 #include "../common/common.h"
 #include "../errors/debug.h"
 #include "../logic/words.h"
+#include "../logic/control.h"
 
 dword gui_start_game();
 void show_words();
+
+void * interface_game( void * varg);
 
 
 #endif

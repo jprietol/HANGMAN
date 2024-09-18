@@ -1,6 +1,8 @@
 #include "interface.h"
 #include <string.h>
 #define MAX_OPTIONS 4
+#define MATRIX_CONVERTION 3
+static inline void printDisplay( info_game * localInfo);
 
 dword gui_start_game()
 {
@@ -104,4 +106,82 @@ void show_words()
         }
 
     }
+}
+
+void * interface_game( void * varg)
+{
+    info_game * currentInfo = (info_game * ) varg;
+    info_game localInfo;
+    char localBuffer [15] = {'\0'};
+
+    sleep(1);
+    while (1)
+    {
+        pthread_mutex_lock(& lock);
+        while (currentInfo->achbuffer[0] != '\0')
+        {
+            pthread_cond_wait(&cv2,&lock);
+            memcpy(&localInfo , currentInfo , sizeof(*currentInfo));
+        }
+        
+        if(localInfo.index_bad > 5)
+        {break;}
+
+        printDisplay(&localInfo);
+        char localBuffer [15];
+        printf("\n\nPlease, write the letters:");
+        scanf("%s", localBuffer);
+
+        memcpy(currentInfo->achbuffer , localBuffer , 15);
+        pthread_cond_signal(&cv1);
+        pthread_mutex_unlock(& lock);
+    }
+
+}
+
+void printDisplay( info_game * localInfo)
+{
+    const char hangmanDraw[] = 
+    {' ' , 'O' , ' ' ,
+     '/' , '|' , '\\',
+     '/' , ' ' , '\\'
+    };
+
+    dword index = 0;
+
+    if (localInfo->index_bad  == 1)
+    {
+        index = localInfo->index_bad * MATRIX_CONVERTION;
+    }
+    else if (localInfo->index_bad == 5)
+    {
+        index = 9;
+    }
+        else if (localInfo->index_bad == 4)
+    {
+        index = 6;
+    }
+    else if(localInfo->index_bad == 0)
+    {
+        index = 0;
+    }
+    else
+    {
+        index = localInfo->index_bad + 2;
+    }
+    
+    system("clear");
+    printf("HANGMAN GAME \n\n");
+    for (size_t i = 0; i < index; i++)
+    {
+        if ((i + 1) % MATRIX_CONVERTION == 0)
+        {
+            printf("%c\n" , hangmanDraw[i]);
+        }
+        else
+        {
+            printf("%c" , hangmanDraw[i]);
+        } 
+    }
+    
 }
