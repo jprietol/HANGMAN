@@ -10,6 +10,7 @@
 
 static void opt(int argc, char  **argv);
 static void printResult(info_game * currentGame);
+static void credits();
 info_game * currentGame = NULL;
 
 int main (int argc, char **argv)
@@ -18,7 +19,6 @@ int main (int argc, char **argv)
     opt( argc ,  argv);
 
     pthread_t pinter_id , plogic_id;
-    //startLogs();
 
    
     bool flagExec = true;
@@ -26,6 +26,8 @@ int main (int argc, char **argv)
     {
         system("clear");
         dword nResult = gui_start_game();
+
+        TPrintDebug("Start Hangman version : %s%s",MAJOR_VER,MENOR_VER);
 
         switch (nResult)
         {
@@ -44,7 +46,7 @@ int main (int argc, char **argv)
                 flagExec = true;
                 break;
             case 3:
-                /*credits*/
+                credits();
                 flagExec = true;
             
             default:
@@ -93,4 +95,11 @@ void printResult(info_game *currentGame)
     {
         printf("You loose the game, the word was %s\n" , currentGame->word);
     }
+}
+
+void credits()
+{
+    
+    printf("Hi, I am Tashiro\n I have created this program to show you my skills in C/C++. I have experience in embedded systems, linux and so on\n");
+    printf("If you are interested, please contact me by: https://www.linkedin.com/in/juan-prieto99?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app");
 }

@@ -1,0 +1,6 @@
+Sep 20 2024 | 15:12:15 | File : main.c | Func : main | Line : 17 | Start the app in debug |
+Sep 20 2024 | 15:15:36 | File : main.c | Func : main | Line : 17 | Start the app in debug |
+Sep 20 2024 | 15:27:59 | File : main.c | Func : main | Line : 17 | Start the app in debug |
+Sep 20 2024 | 15:27:59 | File : ./lib/gui/interface.c | Func : gui_start_game | Line : 25 | Option in while= 1 |
+Sep 20 2024 | 15:27:59 | File : main.c | Func : main | Line : 29 | Start Hangman version : 0.2 |
+Sep 20 2024 | 15:27:59 | File : ./lib/logic/control.c | Func : control_game | Line : 27 | The correct word is pikachu |

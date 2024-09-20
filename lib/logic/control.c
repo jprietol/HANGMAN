@@ -24,6 +24,7 @@ void * control_game(void* vargp)
     int rd_num = rand_r(&seed) % (words->size_bank() - 1 + 1) + 1;
     char achbuffer [15];
     memcpy(achbuffer , words -> select_word(rd_num) , 15);
+    TPrintDebug("The correct word is %s",achbuffer);
     info_game  localInfo;
 
     pthread_mutex_lock(& lock);
@@ -43,7 +44,6 @@ void * control_game(void* vargp)
     bool is_playing = true;
     while (is_playing)
     {
-        //memset(localInfo , 0 , sizeof(*localInfo));
         pthread_mutex_lock(& lock);
         while(currentInfo->achbuffer[0] == '\0')
         {
@@ -112,12 +112,14 @@ bool finish_game(info_game * tmpInfo)
     bool Result = false;
     if (tmpInfo->index_bad > 5)
     {
+        TPrintDebug("FInish the game, the player lost");
         tmpInfo->result = 0; //Looser
         Result = true;
     }
 
     else if (strcmp(tmpInfo->good_letter,tmpInfo->word) == 0)
     {
+        TPrintDebug("FInish the game, the player win");
         tmpInfo->result = 1; // winner
         Result = true;
     }

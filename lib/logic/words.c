@@ -29,12 +29,9 @@ Linked_list * create_linked_list_word()
    
     Words_bank = (Linked_list *) malloc(sizeof(Linked_list));
 
-    //incializamos variables de la estrcutura.
-
     Words_bank -> add_words = &insert_Nodes;
     Words_bank -> delete_word = &delete_Nodes;
     Words_bank -> save_changes = &save_changes_in_file;
-    Words_bank -> show_words = &print_words;
     Words_bank -> select_word = &select_node;
     Words_bank -> delete_linked_list = &delete_linked_list;
     Words_bank -> size_bank = &size_bank_words;
@@ -70,7 +67,7 @@ dword initWords()
 
     while (fgets(achbuffer, MAX_SIZE_WORD, words_file) != NULL) 
     {
-        //Delete the '\n' ENter in the words.
+        //Delete the '\n' Enter in the words.
         for( int i =0 ; i <  MAX_SIZE_WORD; i++)
         {
             if(achbuffer[i] == '\n')
@@ -97,7 +94,7 @@ void insert_Nodes(char  *  NewWord)
 {
     Words * cur = Words_bank -> head;
     if (cur == NULL) {
-    //Memory leak error
+    TPrintDebug("Error memory leak");
     return;
     }
 
@@ -122,7 +119,7 @@ void insert_Nodes(char  *  NewWord)
 
     if (count > MAX_SIZE_WORD - 1)
     {
-        //Pabra muy grande para el espacio de memoria
+        TPrintDebug("The word is so big");
         return;
     }
     
@@ -144,13 +141,13 @@ void delete_Nodes( const dword index )
 
     if (index <= 0)
     {
-        //Error, el numero usado no es valido
+        TPrintDebug("Error, the number is not valid");
         return;
     }
     
     if (index > tmpsize)
     {
-        //error, no se puede encontrar dicho numero
+        TPrintDebug("Error, it is not posible find the number");
         return;
     }
 
@@ -162,7 +159,7 @@ void delete_Nodes( const dword index )
     
     if (cur == NULL)
     {
-        //error, no se encontró el numero especificado.
+        TPrintDebug("Error, the number not found");
         return;
     }
 
@@ -177,7 +174,7 @@ void save_changes_in_file( void )
 
     if (fp == NULL)
     {
-        //TODO : error
+        TPrintDebug("Error, it does not open the file");
         return;
     }
     
@@ -193,23 +190,19 @@ void save_changes_in_file( void )
     fclose(fp); 
 }
 
-void print_words( void )
-{
-    //TODO : Agregar logica para visualizar de modo debug las palabaras guardadas.
-}
 
 char * select_node( int numberNode )
 {
     if (numberNode <= 0)
     {
-        //TODO: insertar,print error
+        TPrintDebug("Error, is not found the node, sent default word");
         return "Default";
     }
     
     dword size = size_bank_words();
     if (numberNode > size)
     {
-        //TODO: insertar,print error.
+        TPrintDebug("The number is not valid, use default word");
         return "Default";
     }
     

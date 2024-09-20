@@ -25,11 +25,10 @@ dword gui_start_game()
         TPrintDebug("Option in while= %d" , nOption);
 
         if (nOption <= 0 || nOption >= MAX_OPTIONS){ 
-            printf("incorrect option. Please select again:");
+            TPrintDebug("Incorrect number used");
         }
         else
         {
-            TPrintDebug("Is correct the number");
             break;
         }    
     }
