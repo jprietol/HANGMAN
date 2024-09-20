@@ -2,7 +2,11 @@
 #include <string.h>
 #define MAX_OPTIONS 4
 #define MATRIX_CONVERTION 3
+
 static inline void printDisplay( info_game * localInfo);
+static inline void printWrongLetters ( info_game * localInfo );
+static inline void printCorrectLetters( info_game const * localInfo);
+static size_t getSizeWord( char const * word);
 
 dword gui_start_game()
 {
@@ -123,11 +127,21 @@ void * interface_game( void * varg)
             pthread_cond_wait(&cv2,&lock);
             memcpy(&localInfo , currentInfo , sizeof(*currentInfo));
         }
-        
-        if(localInfo.index_bad > 5)
-        {break;}
 
+        if (localInfo.word[0] != '\0')
+        {
+            if (finish_game(&localInfo))
+            {
+                break;
+            }
+        }
+        
+        system("clear");
+        printf("HANGMAN GAME \n\n");
+
+        printWrongLetters(&localInfo);
         printDisplay(&localInfo);
+        printCorrectLetters(&localInfo);
         char localBuffer [15];
         printf("\n\nPlease, write the letters:");
         scanf("%s", localBuffer);
@@ -135,8 +149,10 @@ void * interface_game( void * varg)
         memcpy(currentInfo->achbuffer , localBuffer , 15);
         pthread_cond_signal(&cv1);
         pthread_mutex_unlock(& lock);
-    }
 
+        
+    }
+    pthread_exit(NULL);
 }
 
 void printDisplay( info_game * localInfo)
@@ -149,39 +165,59 @@ void printDisplay( info_game * localInfo)
 
     dword index = 0;
 
-    if (localInfo->index_bad  == 1)
-    {
-        index = localInfo->index_bad * MATRIX_CONVERTION;
-    }
-    else if (localInfo->index_bad == 5)
-    {
-        index = 9;
-    }
-        else if (localInfo->index_bad == 4)
-    {
-        index = 6;
-    }
-    else if(localInfo->index_bad == 0)
-    {
-        index = 0;
-    }
-    else
-    {
-        index = localInfo->index_bad + 2;
-    }
+    if (localInfo->index_bad  == 1){ index = localInfo->index_bad * MATRIX_CONVERTION;}
+    else if (localInfo->index_bad == 5){index = 9;}
+    else if (localInfo->index_bad == 4){index = 6;}
+    else if(localInfo->index_bad == 0){index = 0;}
+    else{index = localInfo->index_bad + 2;}
     
-    system("clear");
-    printf("HANGMAN GAME \n\n");
     for (size_t i = 0; i < index; i++)
     {
-        if ((i + 1) % MATRIX_CONVERTION == 0)
+        if ((i + 1) % MATRIX_CONVERTION == 0){printf("%c\n" , hangmanDraw[i]);}
+        else{printf("%c" , hangmanDraw[i]);} 
+    }  
+}
+
+void printWrongLetters ( info_game * localInfo )
+{
+    printf("\n");
+    printf("Wrong letters: ");
+    dword count = localInfo->index_bad;
+    for (size_t i = 0; i < count; i++)
+    {
+        printf("%c  ", localInfo->bad_letter[i]);
+    }
+    printf("\n");
+    
+}
+
+void printCorrectLetters( info_game const * localInfo)
+{
+    size_t size_word = getSizeWord(localInfo->word);
+    printf("\nCorrect letters : ");
+    for (size_t i = 0; i < size_word; i++)
+    {
+        if (localInfo->good_letter[i] == '\0')
         {
-            printf("%c\n" , hangmanDraw[i]);
+            printf(" __ ");
         }
         else
         {
-            printf("%c" , hangmanDraw[i]);
-        } 
+            printf(" %c " , localInfo->good_letter[i]);
+        }
+        
     }
-    
+
+    printf("\n"); 
+}
+
+size_t getSizeWord( char const * word)
+{
+    size_t count = 0; 
+    while ( word[count] != '\0' )
+    {
+        count ++;
+    }
+
+    return count;    
 }

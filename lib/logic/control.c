@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 #define WINNER 1
 #define LOOSER 0
@@ -25,6 +24,7 @@ void * control_game(void* vargp)
     int rd_num = rand_r(&seed) % (words->size_bank() - 1 + 1) + 1;
     char achbuffer [15];
     memcpy(achbuffer , words -> select_word(rd_num) , 15);
+    info_game  localInfo;
 
     pthread_mutex_lock(& lock);
     memcpy(currentInfo->word , achbuffer , sizeof(achbuffer));
@@ -34,10 +34,14 @@ void * control_game(void* vargp)
     currentInfo->index_good = 0;
     currentInfo->index_bad = 0;
     currentInfo->result = 0;
+
+    memcpy(&localInfo , currentInfo , sizeof(*currentInfo));
+    pthread_cond_signal(&cv2);
     pthread_mutex_unlock(& lock);
 
-    info_game  localInfo;
-    while (1)
+    
+    bool is_playing = true;
+    while (is_playing)
     {
         //memset(localInfo , 0 , sizeof(*localInfo));
         pthread_mutex_lock(& lock);
@@ -50,6 +54,10 @@ void * control_game(void* vargp)
         checkLetters(&localInfo);
         memcpy(localInfo.achbuffer , clear_buffer, sizeof(localInfo.achbuffer));
 
+        if (finish_game(&localInfo))
+        {
+            is_playing = false;
+        }
         
         memcpy( currentInfo ,&localInfo , sizeof(*currentInfo));
         pthread_cond_signal(&cv2);
@@ -57,7 +65,10 @@ void * control_game(void* vargp)
         
     }
 
-    //Colocar destructor del word
+    words->delete_linked_list();
+    free(words);
+
+    pthread_exit(NULL);
     
 }
 
@@ -82,6 +93,7 @@ void checkLetters(info_game * tmpInfo)
 
         if (!correct)
         {
+            tmpInfo->bad_letter[tmpInfo->index_bad] = tmpInfo->achbuffer[count];
             tmpInfo->index_bad++;
         }
         count ++;
@@ -93,4 +105,22 @@ void checkLetters(info_game * tmpInfo)
 void init_info_game(info_game ** info_self)
 {
     * info_self = (info_game * ) malloc (sizeof(info_game));
+}
+
+bool finish_game(info_game * tmpInfo)
+{
+    bool Result = false;
+    if (tmpInfo->index_bad > 5)
+    {
+        tmpInfo->result = 0; //Looser
+        Result = true;
+    }
+
+    else if (strcmp(tmpInfo->good_letter,tmpInfo->word) == 0)
+    {
+        tmpInfo->result = 1; // winner
+        Result = true;
+    }
+    
+    return Result;
 }

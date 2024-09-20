@@ -9,6 +9,7 @@
 #include "lib/logic/control.h"
 
 static void opt(int argc, char  **argv);
+static void printResult(info_game * currentGame);
 info_game * currentGame = NULL;
 
 int main (int argc, char **argv)
@@ -57,6 +58,8 @@ int main (int argc, char **argv)
     pthread_join(pinter_id , NULL);
     pthread_mutex_destroy(&lock);
 
+    printResult(currentGame);
+
     
     return SUCCESS;
 }
@@ -75,4 +78,19 @@ void opt(int argc, char **argv)
         
     }
     
+}
+
+void printResult(info_game *currentGame)
+{
+    system("clear");
+    printf("GAME OVER\n\n");
+    
+    if (currentGame->result)
+    {
+        printf("You win the game, the word was %s\n" , currentGame->word);
+    }
+    else
+    {
+        printf("You loose the game, the word was %s\n" , currentGame->word);
+    }
 }

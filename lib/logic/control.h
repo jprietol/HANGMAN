@@ -3,6 +3,7 @@
 
 #include <malloc.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "../common/common.h"
 #include "../errors/debug.h"
 
@@ -22,6 +23,7 @@ typedef struct info
 
 void * control_game(void* vargp);
 void init_info_game(info_game ** info_self);
+bool finish_game(info_game * tmpInfo);
 
 extern pthread_mutex_t lock;
 extern pthread_cond_t cv1;
